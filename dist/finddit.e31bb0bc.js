@@ -117,9 +117,93 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"index.js":[function(require,module,exports) {
-alert(123);
-},{}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+})({"RedditApi.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _default = {
+  search: function search(searchTerm, searchLimit, sortBy) {
+    return fetch("http://www.reddit.com/search.json?q=".concat(searchTerm, "&sort=").concat(sortBy, "&limit=").concat(searchLimit)).then(function (res) {
+      return res.json();
+    }).then(function (data) {
+      return data.data.children.map(function (data) {
+        return data.data;
+      });
+    }).catch(function (err) {
+      return console.log(err);
+    });
+  }
+};
+exports.default = _default;
+},{}],"index.js":[function(require,module,exports) {
+"use strict";
+
+var _RedditApi = _interopRequireDefault(require("./RedditApi"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var searchForm = document.getElementById('search-form');
+var searchInput = document.getElementById('search-input'); // Form event listener
+
+searchForm.addEventListener('submit', function (e) {
+  // Get search term
+  var searchTerm = searchInput.value; // get sort
+
+  var sortBy = document.querySelector('input[name="sortby"]:checked').value; // get limit
+
+  var searchLimit = document.getElementById('limit').value; // check input
+
+  if (searchTerm === '') {
+    // show a message
+    showMessage('Please add a search term.', 'alert-danger');
+  } // Clear input
+
+
+  searchInput.value = ''; // SEARCH REDDIT!!!!!!!!!a
+
+  _RedditApi.default.search(searchTerm, searchLimit, sortBy).then(function (results) {
+    console.log(results);
+    var output = '<div class="card-columns">';
+    results.forEach(function (post) {
+      // check for image
+      var image = post.preview ? post.preview.images[0].source.url : 'http://insights.netgalley.com/wp-content/uploads/2019/04/reddit-logo.jpg';
+      output += "\n        <div class=\"card\">\n            <img src=\"".concat(image, "\" class=\"card-img-top\" alt=\"...\">\n            <div class=\"card-body\">\n                <h5 class=\"card-title\">").concat(post.title, "</h5>\n                <p class=\"card-text\">").concat(truncateText(post.selftext, 100), "</p>\n                <a href=\"").concat(post.url, "\" target=\"_blank\" class=\"btn btn-primary\">Read More</a>\n                <hr>\n                <span class=\"badge badge-secondary\">Subreddit: ").concat(post.subreddit, "</span>\n                <span class=\"badge badge-dark\">Score: ").concat(post.score, "</span>\n            </div>\n        </div>\n        ");
+    });
+    output += '</div>';
+    document.getElementById('results').innerHTML = output;
+  });
+
+  e.preventDefault();
+});
+
+function showMessage(message, className) {
+  // create div
+  var div = document.createElement('div'); // add classes
+
+  div.className = "alert ".concat(className); // add text
+
+  div.appendChild(document.createTextNode(message)); // get parent
+
+  var searchContainer = document.getElementById('search-container'); // get search
+
+  var search = document.getElementById('search'); // insert message
+
+  searchContainer.insertBefore(div, search); // timeout
+
+  setTimeout(function () {
+    return document.querySelector('.alert').remove();
+  }, 3000);
+}
+
+function truncateText(text, limit) {
+  var shortened = text.indexOf(' ', limit);
+  if (shortened == -1) return text;
+  return text.substring(0, shortened);
+}
+},{"./RedditApi":"RedditApi.js"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -147,7 +231,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53284" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60716" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
